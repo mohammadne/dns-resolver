@@ -8,6 +8,7 @@ require (
 	github.com/knadh/koanf/parsers/yaml v0.1.0
 	github.com/knadh/koanf/providers/rawbytes v0.1.0
 	github.com/knadh/koanf/v2 v2.0.1
+	github.com/miekg/dns v1.1.55
 	github.com/spf13/cobra v1.7.0
 	go.uber.org/zap v1.24.0
 )
@@ -36,6 +37,9 @@ require (
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
+	golang.org/x/mod v0.7.0 // indirect
+	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sys v0.9.0 // indirect
+	golang.org/x/tools v0.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -1,21 +1,39 @@
 package dns
 
 import (
+	_ "embed"
+	"encoding/csv"
 	"fmt"
 	"log"
 	"net"
+	"strings"
 
-	"github.com/mohammadne/dns-resolver/internal/models"
 	"go.uber.org/zap"
 )
 
 type Server struct {
-	logger     *zap.Logger
-	datasource models.Records
+	logger  *zap.Logger
+	records map[string]string
 }
+
+//go:embed mappings.csv
+var mappings []byte
 
 func New(log *zap.Logger) *Server {
 	server := &Server{logger: log}
+
+	{
+		reader := csv.NewReader(strings.NewReader(string(mappings)))
+		records, err := reader.ReadAll()
+		if err != nil {
+			log.Fatal("Error reading csv mapping file", zap.Error(err))
+		}
+
+		server.records = make(map[string]string, len(records))
+		for _, record := range records {
+			server.records[record[0]] = record[1]
+		}
+	}
 
 	return server
 }
