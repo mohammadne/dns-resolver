@@ -25,8 +25,8 @@ func New(log *zap.Logger) *Server {
 }
 
 func (server *Server) Serve(port int) error {
-	addr := fmt.Sprintf(":%d", port)
-	if err := server.app.Listen(addr); err != nil {
+	address := fmt.Sprintf(":%d", port)
+	if err := server.app.Listen(address); err != nil {
 		server.logger.Error("error resolving server", zap.Error(err))
 		return err
 	}

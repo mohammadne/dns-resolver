@@ -3,6 +3,8 @@ package cmd
 import (
 	"os"
 
+	"github.com/mohammadne/dns-resolver/internal/api/dns"
+	"github.com/mohammadne/dns-resolver/internal/api/http"
 	"github.com/mohammadne/dns-resolver/internal/config"
 	"github.com/mohammadne/dns-resolver/pkg/logger"
 	"github.com/spf13/cobra"
@@ -26,6 +28,9 @@ func (cmd Server) Command(trap chan os.Signal) *cobra.Command {
 func (cmd *Server) main(cfg *config.Config, trap chan os.Signal) {
 	logger := logger.NewZap(cfg.Logger)
 	_ = logger
+
+	go http.New(logger).Serve(8080)
+	go dns.New(logger).Serve(5354)
 
 	// Keep this at the bottom of the main function
 	field := zap.String("signal trap", (<-trap).String())
