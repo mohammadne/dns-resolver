@@ -1,0 +1,4 @@
+logger:
+  development: true
+  level: "info"
+  encoding: "console"
