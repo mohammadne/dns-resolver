@@ -5,11 +5,13 @@ import (
 	"log"
 	"net"
 
+	"github.com/mohammadne/dns-resolver/internal/models"
 	"go.uber.org/zap"
 )
 
 type Server struct {
-	logger *zap.Logger
+	logger     *zap.Logger
+	datasource models.Records
 }
 
 func New(log *zap.Logger) *Server {
