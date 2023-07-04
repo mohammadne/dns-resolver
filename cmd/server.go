@@ -27,7 +27,6 @@ func (cmd Server) Command(trap chan os.Signal) *cobra.Command {
 
 func (cmd *Server) main(cfg *config.Config, trap chan os.Signal) {
 	logger := logger.NewZap(cfg.Logger)
-	_ = logger
 
 	go http.New(logger).Serve(8080)
 	go dns.New(logger).Serve(5354)
