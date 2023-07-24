@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "dns-resolver.fullname" . }}-test-connection"
+  labels:
+    {{- include "dns-resolver.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "dns-resolver.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

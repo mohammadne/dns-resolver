@@ -1,0 +1,37 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "dns-resolver.fullname" . }}-dns
+  annotations:
+    cloud.networking.sotoon.ir/load-balancer: {{ include "dns-resolver.fullname" . }}-nginx
+    cloud.networking.sotoon.ir/load-balancer-external-ip: {{ include "dns-resolver.fullname" . }}-nginx-lb
+  labels:
+    {{- include "dns-resolver.labels" . | nindent 4 }}
+spec:
+  externalTrafficPolicy: Cluster
+  type: LoadBalancer
+  ports:
+    - name: dns
+      port: {{ .Values.service.dns.port }}
+      targetPort: dns
+      protocol: {{ .Values.service.dns.protocol  }}
+  selector:
+    {{- include "dns-resolver.selectorLabels" . | nindent 4 }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "dns-resolver.fullname" . }}-http
+  labels:
+    {{- include "dns-resolver.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: {{ .Values.service.http.port }}
+      targetPort: http
+      protocol: {{ .Values.service.http.protocol  }}
+  selector:
+    {{- include "dns-resolver.selectorLabels" . | nindent 4 }}
