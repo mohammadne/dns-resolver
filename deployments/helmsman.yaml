@@ -3,7 +3,7 @@ settings:
   timeout: 6000
 
 namespaces:
-  mentorship:
+  dns-resolver:
     labels:
       managed-by: helmsman
   ingress-nginx:
@@ -26,6 +26,15 @@ helmRepos:
   prometheus-community: https://prometheus-community.github.io/helm-charts
 
 apps:
+  dns-resolver:
+    name: dns-resolver
+    namespace: dns-resolver
+    chart: "./dns-resolver"
+    enabled: true
+    version: "0.1.0"
+    secretsFiles: 
+      - ./dns-resolver/secrets.yaml
+
   ingress-nginx:
     name: ingress-nginx
     namespace: ingress-nginx
@@ -67,12 +76,3 @@ apps:
       - ./monitoring/values.yaml
     # hooks:
     #   postInstall: ./monitoring/create-dashboards.yaml
-
-  dns-resolver:
-    name: dns-resolver
-    namespace: mentorship
-    chart: "./dns-resolver"
-    enabled: true
-    version: "0.1.0"
-    secretsFiles: 
-      - ./dns-resolver/secrets.yaml
