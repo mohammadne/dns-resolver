@@ -2,17 +2,41 @@
 
 DNS resolver written in Go
 
-## Testing
+## Deployment
+
+```bash
+# 
+make deploy
+
+# 
+make undeploy
+```
+
+## Request
 
 ### DNS
 
 ```bash
-echo "Hello, UDP server" | socat - UDP-DATAGRAM:localhost:5354
+# testing locally
+dig @localhost -p 5354 example19.com A
+
+# test from inside the cluster
+kubectl run -it --image=nicolaka/netshoot --rm=true --restart=Never tshoot -- bash
+dig @dns-resolver-dns.mentorship -p 5354 example19.com
+
+# test from outside the cluster via service loadbalancer
+ip=$(k get svc/dns-resolver-dns -n mentorship | awk '{print $4}' | grep -v EXTERNAL-IP | cut -d, -f2 )
+dig @$ip -p 5354 example19.com
 ```
 
 ### Health endpoints
 
 ```bash
+# testing locally
 curl localhost:8080/healthz/liveness
 curl localhost:8080/healthz/readiness
+
+# test from inside the cluster
+kubectl run -it --image=nicolaka/netshoot --rm=true --restart=Never tshoot -- bash
+curl dns-resolver-server-http/healthz/readiness
 ```

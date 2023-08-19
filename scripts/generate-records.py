@@ -1,13 +1,11 @@
 import csv
-import random
-import socket
 
 def generate_domain_ip_mapping(id):
     return f"example{id}.com.", f"172.1.0.{id}"
 
 def main():
     # Create a new CSV file
-    with open('domain_ip_mappings.csv', 'w', newline='') as file:
+    with open('mappings.csv', 'w', newline='') as file:
         writer = csv.writer(file)
 
         # Write the header row

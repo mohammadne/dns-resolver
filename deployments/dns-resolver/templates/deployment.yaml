@@ -20,6 +20,8 @@ spec:
       labels:
         {{- include "dns-resolver.selectorLabels" . | nindent 8 }}
     spec:
+      imagePullSecrets:
+        - name: {{ include "dns-resolver.fullname" . }}-registrypullsecret
       serviceAccountName: {{ include "dns-resolver.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}

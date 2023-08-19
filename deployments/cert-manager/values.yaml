@@ -1,0 +1,5 @@
+ingressShim:
+  defaultIssuerName: "letsencrypt"
+  defaultIssuerKind: "ClusterIssuer"
+
+installCRDs: true

@@ -1,0 +1,7 @@
+controller:
+  service:
+    externalTrafficPolicy: Cluster
+    annotations:
+      cloud.networking.sotoon.ir/load-balancer: ingress-nginx
+      cloud.networking.sotoon.ir/load-balancer-external-ip: ingress-nginx-lb
+

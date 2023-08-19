@@ -1,9 +1,9 @@
 ---
-replicaCount: 1
+replicaCount: 3
 
 image:
-  registry: ghcr.io
-  repository: mohammadne/dns-resolver
+  registry: registry.cafebazaar.ir:5000
+  repository: cloud/openstack/mentorship/dns-resolver
   tag: ""
   pullPolicy: Always
 
@@ -42,13 +42,11 @@ ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
   hosts:
-    - host: 87-247-188-109.nip.io
+    - host: dns-resolver.mohammadne.me
       paths:
-        - path: /dns-resolver(/|$)(.*)
+        - path: /
           pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
@@ -57,11 +55,11 @@ ingress:
 
 resources:
   limits:
-    cpu: 100m
-    memory: 128Mi
+    cpu: 500m
+    memory: 1GiB
   requests:
-    cpu: 100m
-    memory: 128Mi
+    cpu: 200m
+    memory: 512Mi
 
 autoscaling:
   enabled: false
@@ -77,4 +75,5 @@ tolerations: []
 affinity: {}
 
 serviceMonitor:
-  enabled: false
+  enabled: true
+  release: kube-prometheus-stack

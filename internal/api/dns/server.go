@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"strings"
+	"time"
 
 	"go.uber.org/zap"
 )
@@ -14,13 +15,14 @@ import (
 type Server struct {
 	logger  *zap.Logger
 	records map[string]string
+	metrics *metrics
 }
 
 //go:embed mappings.csv
 var mappings []byte
 
 func New(log *zap.Logger) *Server {
-	server := &Server{logger: log}
+	server := &Server{logger: log, metrics: newMetrics()}
 
 	{
 		reader := csv.NewReader(strings.NewReader(string(mappings)))
@@ -57,6 +59,33 @@ func (server *Server) Serve(port int) error {
 	fmt.Println("Listening on UDP port", udpAddress.Port)
 
 	for {
-		server.handleDNS(conn)
+		buffer := make([]byte, 1500)
+		rlen, remote, err := conn.ReadFromUDP(buffer[:])
+		if err != nil {
+			server.logger.Error("Error reading from UDP", zap.Error(err))
+			continue
+		}
+
+		go func() {
+			start := time.Now()
+
+			server.metrics.requestsInProgress.WithLabelValues().Inc()
+			server.metrics.requestsTotal.WithLabelValues().Inc()
+
+			response, err := server.handleDNS(buffer[:rlen])
+			if err != nil {
+				server.logger.Error("Error processing the request", zap.Error(err))
+				return
+			}
+
+			// Send a response back to the client
+			if _, err := conn.WriteToUDP(response, remote); err != nil {
+				server.logger.Error("Error sending response", zap.Error(err))
+			}
+
+			elapsed := float64(time.Since(start).Nanoseconds()) / 1e9
+			server.metrics.requestsDuration.WithLabelValues().Observe(elapsed)
+			server.metrics.requestsInProgress.WithLabelValues().Dec()
+		}()
 	}
 }

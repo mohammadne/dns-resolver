@@ -1,0 +1,78 @@
+settings:
+  maxHistory: 10
+  timeout: 6000
+
+namespaces:
+  mentorship:
+    labels:
+      managed-by: helmsman
+  ingress-nginx:
+    labels:
+      managed-by: helmsman
+  cert-manager:
+    labels:
+      managed-by: helmsman
+  monitoring:
+    labels:
+      managed-by: helmsman
+
+helmRepos:
+  # https://spacelift.io/blog/kubernetes-ingress
+  ingress-nginx: https://kubernetes.github.io/ingress-nginx
+
+  jetstack: https://charts.jetstack.io
+
+  # https://blog.container-solutions.com/prometheus-operator-beginners-guide
+  prometheus-community: https://prometheus-community.github.io/helm-charts
+
+apps:
+  ingress-nginx:
+    name: ingress-nginx
+    namespace: ingress-nginx
+    priority: -250000
+    chart: ingress-nginx/ingress-nginx
+    version: 4.7.1
+    wait: true
+    enabled: true
+    # hooks:
+    #   preInstall: https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-45.1.1/charts/kube-prometheus-stack/crds/crd-servicemonitors.yaml
+    valuesFiles:
+      - ./ingress-nginx/values.yaml
+
+  cert-manager:
+    name: cert-manager
+    namespace: cert-manager
+    priority: -250000
+    chart: jetstack/cert-manager
+    version: v1.12.0
+    wait: true
+    enabled: true
+    hooks:
+      postInstall: ./cert-manager/cluster-issuer.yaml
+    valuesFiles:
+      - ./cert-manager/values.yaml
+
+  kube-prometheus-stack:
+    name: kube-prometheus-stack
+    namespace: monitoring
+    priority: -200000
+    chart: prometheus-community/kube-prometheus-stack
+    version: 48.1.2
+    wait: true
+    timeout: 500
+    enabled: true
+    secretsFiles:
+      - ./monitoring/secrets.yaml
+    valuesFiles:
+      - ./monitoring/values.yaml
+    # hooks:
+    #   postInstall: ./monitoring/create-dashboards.yaml
+
+  dns-resolver:
+    name: dns-resolver
+    namespace: mentorship
+    chart: "./dns-resolver"
+    enabled: true
+    version: "0.1.0"
+    secretsFiles: 
+      - ./dns-resolver/secrets.yaml

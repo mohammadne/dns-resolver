@@ -9,6 +9,7 @@ metadata:
   {{- end }}
   labels:
     {{- include "dns-resolver.labels" . | nindent 4 }}
+    release: {{ .Values.serviceMonitor.release }}
 spec:
   endpoints:
   - port: http

@@ -1,20 +1,25 @@
 package logger
 
 import (
+	"log"
 	"os"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
+func NewNoop() *zap.Logger {
+	return zap.NewNop()
+}
+
 func NewZap(cfg *Config) *zap.Logger {
 	return zap.New(
-		zapcore.NewCore(getEncoder(cfg), getWriteSyncer(cfg), getLoggerLevel(cfg)),
-		getOptions(cfg)...,
+		zapcore.NewCore(Encoder(cfg), WriteSyncer(cfg), LoggerLevel(cfg)),
+		Options(cfg)...,
 	)
 }
 
-func getEncoder(cfg *Config) zapcore.Encoder {
+func Encoder(cfg *Config) zapcore.Encoder {
 	var encoderConfig zapcore.EncoderConfig
 	if cfg.Development {
 		encoderConfig = zap.NewDevelopmentEncoderConfig()
@@ -36,21 +41,22 @@ func getEncoder(cfg *Config) zapcore.Encoder {
 	return encoder
 }
 
-func getWriteSyncer(cfg *Config) zapcore.WriteSyncer {
+func WriteSyncer(cfg *Config) zapcore.WriteSyncer {
 	return zapcore.Lock(os.Stdout)
 }
 
-func getLoggerLevel(cfg *Config) zap.AtomicLevel {
+func LoggerLevel(cfg *Config) zap.AtomicLevel {
 	var level zapcore.Level
 
 	if err := level.Set(cfg.Level); err != nil {
+		log.Printf("using debug level for zap due to an error in user's config value %s", cfg.Level)
 		return zap.NewAtomicLevelAt(zapcore.DebugLevel)
 	}
 
 	return zap.NewAtomicLevelAt(level)
 }
 
-func getOptions(cfg *Config) []zap.Option {
+func Options(cfg *Config) []zap.Option {
 	return []zap.Option{
 		zap.AddStacktrace(zap.ErrorLevel),
 		zap.AddCaller(),
